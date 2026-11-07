@@ -204,20 +204,20 @@ btnM.addEventListener("click", () => sonando ? pararMusica() : arrancarMusica())
       x.clearRect(0, 0, W, H);
       for (const s of est) {
         if (!quieto) { s.x -= opts.vel * s.prof; s.y += opts.vel * .35 * s.prof; if (s.x < -4) s.x = W + 4; if (s.y > H + 4) s.y = -4; }
-        const a = opts.brillo * (.35 + .65 * (Math.sin(t / 1000 * s.v + s.f) * .5 + .5));
+        const a = opts.brillo * (.2 + .8 * (Math.sin(t / 1000 * s.v + s.f) * .5 + .5));
         x.globalAlpha = a; x.fillStyle = s.oro ? "#ffe1a0" : "#ffffff";
         x.beginPath(); x.arc(s.x, s.y, s.r, 0, 7); x.fill();
         if (s.r > opts.tam * .8) { x.globalAlpha = a * .25; x.beginPath(); x.arc(s.x, s.y, s.r * 3.2, 0, 7); x.fill(); }
       }
       if (opts.fugaces && !quieto) {
-        if (t > prox && fugaces.length < 3) {
-          fugaces.push({ x: W * (.15 + Math.random() * .85), y: H * Math.random() * .6, l: 0, max: 80 + Math.random() * 90, v: 3 + Math.random() * 2.5, cola: 70 + Math.random() * 60 });
-          prox = t + 1200 + Math.random() * 2300;
+        if (t > prox && fugaces.length < 5) {
+          fugaces.push({ x: W * (.15 + Math.random() * .85), y: H * Math.random() * .6, l: 0, max: 80 + Math.random() * 90, v: 4 + Math.random() * 3, cola: 90 + Math.random() * 80 });
+          prox = t + 500 + Math.random() * 1200;
         }
         for (const f of fugaces) {
           f.l += f.v; const k = f.l / f.max, x2 = f.x - f.l * 2.2, y2 = f.y + f.l, cx2 = f.cola, cy2 = f.cola * .46;
           const g = x.createLinearGradient(x2, y2, x2 + cx2, y2 - cy2); g.addColorStop(0, "rgba(255,240,210," + (1 - k) + ")"); g.addColorStop(1, "rgba(255,240,210,0)");
-          x.globalAlpha = 1; x.strokeStyle = g; x.lineWidth = 1.8; x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 + cx2, y2 - cy2); x.stroke();
+          x.globalAlpha = 1; x.strokeStyle = g; x.lineWidth = 2.2; x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 + cx2, y2 - cy2); x.stroke();
           x.globalAlpha = 1 - k; x.fillStyle = "#fff"; x.beginPath(); x.arc(x2, y2, 1.6, 0, 7); x.fill();
         }
         fugaces = fugaces.filter(f => f.l < f.max);
@@ -227,8 +227,8 @@ btnM.addEventListener("click", () => sonando ? pararMusica() : arrancarMusica())
     }
     addEventListener("resize", medir); medir(); requestAnimationFrame(dibujar);
   }
-  cielo(document.getElementById("cieloFondo"), { densidad: 2600, tam: 1.4, vel: .16, brillo: .9, fugaces: true });
-  cielo(document.getElementById("cieloCard"), { densidad: 1700, tam: 1.3, vel: .14, brillo: .75, fugaces: true });
+  cielo(document.getElementById("cieloFondo"), { densidad: 1800, tam: 2.0, vel: .55, brillo: 1, fugaces: true });
+  cielo(document.getElementById("cieloCard"), { densidad: 1300, tam: 1.9, vel: .5, brillo: .95, fugaces: true });
 })();
 </script>
 </body>
