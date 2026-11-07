@@ -121,11 +121,13 @@ document.getElementById("cerrar").addEventListener("click", cerrar);
 velo.addEventListener("click", e => { if (e.target === velo) cerrar(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !velo.hidden) cerrar(); });
 
-/* ----- Guardar en Google Sheets ----- */
+/* ----- Guardar en el Formulario de Google (respuestas van a la planilla) ----- */
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSekf87Q6Fn6BZQpsJfe4EviT7rPBtBr6G0xVPVdD5MTv45dqQ/formResponse";
 function guardar(ci, nombre, mesa) {
-  if (!SCRIPT_URL || SCRIPT_URL.indexOf("http") !== 0) return Promise.resolve(false);
-  return fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ ci, nombre, mesa: String(mesa) }) }).then(() => true).catch(() => false);
+  const datos = new URLSearchParams();
+  datos.append("entry.971661088", ci);
+  datos.append("entry.741403619", nombre);
+  return fetch(FORM_URL, { method: "POST", mode: "no-cors", body: datos }).then(() => true).catch(() => false);
 }
 
 /* ----- Confirmación ----- */
