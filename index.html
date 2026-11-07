@@ -68,7 +68,7 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="tit">
     <button class="cerrar" id="cerrar" type="button" aria-label="Cerrar">×</button>
     <p class="script" id="tit">Confirmá tu asistencia</p>
-    <p class="lead">Ingresá tu número de cédula para confirmar y conocer tu mesa.</p>
+    <p class="lead">Ingresá tu número de cédula para confirmar tu asistencia.</p>
     <form id="form" autocomplete="off">
       <label for="ci">Número de cédula</label>
       <div class="fila">
@@ -128,8 +128,8 @@ document.getElementById("form").addEventListener("submit", async e => {
   const enviar = document.getElementById("enviar"); enviar.disabled = true;
   const guardado = await guardar(ci, p[0], p[1]);
   enviar.disabled = false;
-  res.innerHTML = '<p class="ok">¡Asistencia confirmada!</p><p class="nombre">' + esc(p[0]) + '</p>' +
-    '<div class="mesa"><span>Tu mesa</span><strong>' + esc(p[1]) + '</strong></div>' +
+  res.innerHTML = '<p class="ok">¡Asistencia confirmada!</p><p class="nombre" style="font-size:24px;margin-top:6px">' + esc(p[0]) + '</p>' +
+    
     (guardado ? '<p class="nota">Tu confirmación quedó registrada. ¡Te esperamos!</p>' : '<p class="nota">¡Te esperamos el sábado 19 de diciembre!</p>');
   void res.offsetWidth; res.classList.add("anim");
   try { arrancarMusica(); } catch (_) {}
