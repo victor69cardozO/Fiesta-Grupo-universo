@@ -139,6 +139,21 @@ function guardar(ci, nombre, mesa) {
 }
 
 /* ----- Confirmación ----- */
+/* Consultar en Google quién ya confirmó (lista pública solo con códigos, sin nombres ni cédulas) */
+const CLAVES_ID = "1A3eyKXNy4g7pNcWWwFJ_hyuBASEa0PfgF77cqX6598A";
+const codigoCI = ci => (Number(ci) * 48271 + 12345) % 1000003;
+function clavesConfirmadas() {
+  return new Promise(resolve => {
+    const cb = "__claves" + Date.now(), s = document.createElement("script");
+    const fin = v => { clearTimeout(t); try { delete window[cb]; } catch (_) {} s.remove(); resolve(v); };
+    const t = setTimeout(() => fin(null), 6000);
+    window[cb] = d => { try { fin(new Set(d.table.rows.map(r => r.c && r.c[0] && r.c[0].v).filter(v => typeof v === "number"))); } catch (_) { fin(null); } };
+    s.onerror = () => fin(null);
+    s.src = "https://docs.google.com/spreadsheets/d/" + CLAVES_ID + "/gviz/tq?tqx=out:json;responseHandler:" + cb + "&headers=1&_=" + Date.now();
+    document.head.appendChild(s);
+  });
+}
+
 /* Recordar en este dispositivo quién ya confirmó (para no repetir) */
 function yaConfirmados() { try { return JSON.parse(localStorage.getItem("confirmados2026") || "[]"); } catch (_) { return []; } }
 function marcarConfirmado(k) { try { const l = yaConfirmados(); if (!l.includes(k)) { l.push(k); localStorage.setItem("confirmados2026", JSON.stringify(l)); } } catch (_) {} }
@@ -166,7 +181,17 @@ async function confirmar() {
     return;
   }
   const enviar = document.getElementById("enviar");
-  enviar.disabled = true; enviar.textContent = "Enviando…";
+  enviar.disabled = true; enviar.textContent = "Verificando…";
+  const claves = await clavesConfirmadas();
+  if (claves && claves.has(codigoCI(ci))) {
+    enviar.disabled = false; enviar.textContent = "Confirmar";
+    enSesion.add(k); marcarConfirmado(k);
+    res.innerHTML = '<p class="ok">¡Ya estás confirmado/a!</p><p class="nombre" style="font-size:24px;margin-top:6px">' + esc(p[0]) + '</p>' +
+      '<p class="nota">Tu asistencia ya quedó registrada, no hace falta confirmar de nuevo. ¡Te esperamos el sábado 19 de diciembre!</p>';
+    void res.offsetWidth; res.classList.add("anim");
+    return;
+  }
+  enviar.textContent = "Enviando…";
   const guardado = await guardar(ci, p[0], p[1]);
   enviar.disabled = false; enviar.textContent = "Confirmar";
   enSesion.add(k); marcarConfirmado(k);
