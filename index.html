@@ -139,23 +139,43 @@ function guardar(ci, nombre, mesa) {
 }
 
 /* ----- Confirmación ----- */
+/* Recordar en este dispositivo quién ya confirmó (para no repetir) */
+function yaConfirmados() { try { return JSON.parse(localStorage.getItem("confirmados2026") || "[]"); } catch (_) { return []; } }
+function marcarConfirmado(k) { try { const l = yaConfirmados(); if (!l.includes(k)) { l.push(k); localStorage.setItem("confirmados2026", JSON.stringify(l)); } } catch (_) {} }
+const enSesion = new Set();
+let enviando = false;
+
 document.getElementById("form").addEventListener("submit", async e => {
   e.preventDefault();
+  if (enviando) return;                       // evita doble clic mientras se envía
+  enviando = true;
+  try { await confirmar(); } finally { enviando = false; }
+});
+
+async function confirmar() {
   const ci = limpiar(input.value);
   res.hidden = false; res.classList.remove("anim");
   if (!ci) { res.innerHTML = '<p class="error">Escribí tu número de cédula.</p>'; return; }
-  const p = INVITADOS[await clave(ci)];
+  const k = await clave(ci);
+  const p = INVITADOS[k];
   if (!p) { res.innerHTML = '<p class="error">No encontramos la cédula ' + esc(ci) + '. Revisá el número o consultá con Talento Humano.</p>'; return; }
-  const enviar = document.getElementById("enviar"); enviar.disabled = true;
+  if (enSesion.has(k) || yaConfirmados().includes(k)) {
+    res.innerHTML = '<p class="ok">¡Ya estás confirmado/a!</p><p class="nombre" style="font-size:24px;margin-top:6px">' + esc(p[0]) + '</p>' +
+      '<p class="nota">Tu asistencia ya quedó registrada, no hace falta confirmar de nuevo. ¡Te esperamos el sábado 19 de diciembre!</p>';
+    void res.offsetWidth; res.classList.add("anim");
+    return;
+  }
+  const enviar = document.getElementById("enviar");
+  enviar.disabled = true; enviar.textContent = "Enviando…";
   const guardado = await guardar(ci, p[0], p[1]);
-  enviar.disabled = false;
+  enviar.disabled = false; enviar.textContent = "Confirmar";
+  enSesion.add(k); marcarConfirmado(k);
   res.innerHTML = '<p class="ok">¡Asistencia confirmada!</p><p class="nombre" style="font-size:24px;margin-top:6px">' + esc(p[0]) + '</p>' +
-    
     (guardado ? '<p class="nota">Tu confirmación quedó registrada. ¡Te esperamos!</p>' : '<p class="nota">¡Te esperamos el sábado 19 de diciembre!</p>');
   void res.offsetWidth; res.classList.add("anim");
   try { arrancarMusica(); } catch (_) {}
   celebrar();
-});
+}
 
 /* ----- Confeti ----- */
 const COLORES = ["#f0c66b", "#fde6a8", "#ffffff", "#c9d6ea", "#5aa7ff", "#e2ad45"];
