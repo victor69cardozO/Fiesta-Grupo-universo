@@ -140,7 +140,7 @@ function guardar(ci, nombre, mesa) {
 
 /* ----- Confirmación ----- */
 /* Consultar en Google quién ya confirmó (lista pública solo con códigos, sin nombres ni cédulas) */
-const CLAVES_ID = "1A3eyKXNy4g7pNcWWwFJ_hyuBASEa0PfgF77cqX6598A";
+const CLAVES_ID = "1xgAG6g3EclpQyNzmTTKBLGVFhBA9vxf1cO6kn2w80tA";
 const codigoCI = ci => (Number(ci) * 48271 + 12345) % 1000003;
 function clavesConfirmadas() {
   return new Promise(resolve => {
