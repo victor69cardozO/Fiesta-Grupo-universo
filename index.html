@@ -122,7 +122,18 @@ async function clave(ci) {
 /* ----- Ventana ----- */
 const velo = document.getElementById("velo"), input = document.getElementById("ci"), res = document.getElementById("res");
 const abrirBtn = document.getElementById("abrir");
-function abrir() { velo.hidden = false; setTimeout(() => input.focus(), 50); }
+/* Cierre de confirmaciones: martes 17/11/2026 a las 01:00 (hora de Paraguay, UTC-3) */
+const CIERRE = Date.UTC(2026, 10, 17, 4, 0, 0);
+const cerrado = () => Date.now() >= CIERRE;
+function mostrarCerrado() {
+  document.getElementById("form").hidden = true;
+  document.querySelector(".lead").hidden = true;
+  document.getElementById("tit").textContent = "Confirmaciones cerradas";
+  res.hidden = false;
+  res.innerHTML = '<p class="error" style="font-size:17px">El plazo para confirmar asistencia ya cerró.</p>' +
+    '<p class="nota">Si necesitás confirmar o hacer alguna consulta, por favor comunicate con <b>Talento Humano</b>.</p>';
+}
+function abrir() { velo.hidden = false; if (cerrado()) { mostrarCerrado(); return; } setTimeout(() => input.focus(), 50); }
 function cerrar() { velo.hidden = true; abrirBtn.focus(); }
 abrirBtn.addEventListener("click", abrir);
 document.getElementById("cerrar").addEventListener("click", cerrar);
@@ -168,6 +179,7 @@ document.getElementById("form").addEventListener("submit", async e => {
 });
 
 async function confirmar() {
+  if (cerrado()) { mostrarCerrado(); return; }
   const ci = limpiar(input.value);
   res.hidden = false; res.classList.remove("anim");
   if (!ci) { res.innerHTML = '<p class="error">Escribí tu número de cédula.</p>'; return; }
